@@ -1,3 +1,5 @@
+"""Write advanced filename patterns using the Format String Syntax."""
+
 import base64
 import os
 import re
@@ -6,10 +8,12 @@ from string import Formatter
 from datetime import datetime
 import time
 
-
 from django.utils.text import slugify
 
+from . import _version # noqa
 
+__version__ = _version.__version__
+VERSION = _version.VERSION_TUPLE
 class SlugFormatter(Formatter):
     format_spec_pattern = re.compile(r"(\.\d+)?([\d\w]+)?")
 
