@@ -1,17 +1,13 @@
-"""Write advanced filename patterns using the Format String Syntax."""
-
 import base64
 import os
 import re
 import uuid
 from string import Formatter
+from datetime import datetime
+import time
+
 
 from django.utils.text import slugify
-
-from . import _version  # noqa
-
-__version__ = _version.__version__
-VERSION = _version.VERSION_TUPLE
 
 
 class SlugFormatter(Formatter):
@@ -19,10 +15,16 @@ class SlugFormatter(Formatter):
 
     def format_field(self, value, format_spec):
         precision, ftype = self.format_spec_pattern.match(format_spec).groups()
+        print("formatspec", format_spec)
+        print("precition", precision)
+        print("Ftype" , ftype)
+        print("Value", value)
         if precision:
             precision = int(precision.lstrip("."))
         if ftype == "slug":
             return slugify(value, allow_unicode=False)[:precision]
+        if ftype == "unix":
+            return str(int(datetime.now().timestamp()))
         return super().format_field(value=value, format_spec=format_spec)
 
 
@@ -54,6 +56,7 @@ class ExtendedUUID(uuid.UUID):
                 .rstrip("=\n")[:precision]
             )
         return super().__format__(format_spec)
+
 
 
 class FilePattern:
@@ -118,6 +121,7 @@ class FilePattern:
             "app_label": instance._meta.app_label,
             "uuid": self.get_uuid(),
             "instance": instance,
+            "timestamp": datetime.now(),  # Default to current datetime if not specified.
         }
         defaults.update(self.override_values)
         return self.formatter.format(self.filename_pattern, **defaults)
